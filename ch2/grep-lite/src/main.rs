@@ -4,19 +4,11 @@ use std::io::BufReader;
 
 fn main() {
     let f = File::open("Cargo.toml").unwrap();
-    let mut reader = BufReader::new(f);
+    let reader = BufReader::new(f);
 
-    let mut line = String::new();
-
-    loop {
-        let len = reader.read_line(&mut line).unwrap();
-        if len == 0 {
-            break;
-        }
-
-        dbg!(&line, len);
-        println!("{} ({} bytes long)", line, len);
-
-        line.truncate(0);
+    for line in reader.lines() {
+        let line = line.unwrap();
+        let len = line.len();
+        println!("{} {}", line, len);
     }
 }
