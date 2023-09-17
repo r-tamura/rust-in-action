@@ -2,7 +2,7 @@ use std::fmt;
 use std::fmt::Display;
 
 #[derive(Debug, PartialEq)]
-enum FileState {
+pub enum FileState {
     Open,
     Closed,
 }
@@ -17,14 +17,14 @@ impl Display for FileState {
 }
 
 #[derive(Debug)]
-struct File {
-    name: String,
+pub struct File {
+    pub name: String,
     data: Vec<u8>,
-    state: FileState,
+    pub state: FileState,
 }
 
 impl File {
-    fn new(name: &str) -> File {
+    pub fn new(name: &str) -> File {
         File {
             name: String::from(name),
             data: Vec::new(),
@@ -72,10 +72,7 @@ fn close(mut f: File) -> Result<File, String> {
 
 fn main() {
     let f_data: Vec<u8> = vec![114, 117, 115, 116, 23];
-    let f = File::new_with_data(
-        "test.txt",
-        &f_data,
-    );
+    let f = File::new("test.text");
 
     let mut buffer : Vec<u8> = vec![];
 
