@@ -1,3 +1,4 @@
+//! ファイル群を段階的にシミュレートする
 use std::fmt;
 use std::fmt::Display;
 
@@ -24,12 +25,23 @@ pub struct File {
 }
 
 impl File {
+    /// 新規ファイルは空とみなすが、ファイル名は必須
     pub fn new(name: &str) -> File {
         File {
             name: String::from(name),
             data: Vec::new(),
             state: FileState::Closed,
         }
+    }
+
+    /// ファイルの長さ（バイト数）を返す
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    /// ファイル名を返す
+    pub fn name(&self) -> String {
+        self.name.clone()
     }
 
     fn new_with_data(
