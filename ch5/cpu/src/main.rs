@@ -3,12 +3,16 @@
 enum Opcode {
     Add(u8, u8),
     Halt,
+    Call(u16),
+    Ret,
 }
 
 struct CPU {
     registers: [u8; 16],
     pc: usize,
     memory: [u8; 0x1000],
+    stack: [u16; 16],
+    sp: usize,
 }
 
 impl CPU {
@@ -18,11 +22,14 @@ impl CPU {
             registers: [0; 16],
             pc: 0,
             memory: [0; 0x1000],
+            stack: [0; 16],
+            sp: 0,
         }
     }
-    fn read_opcode(&self) -> u16 {
+    fn fetch(&mut self) -> u16 {
         let opbyte_h = self.memory[self.pc] as u16;
         let opbyte_l = self.memory[self.pc + 1] as u16;
+        self.pc += 2;
         (opbyte_h << 8) | opbyte_l
     }
 
@@ -34,6 +41,8 @@ impl CPU {
 
         let c = match (c, x, y, n) {
             (0x0, 0x0, 0x0, 0x0) => Opcode::Halt,
+            (0x0, 0x0, 0xE, 0xE) => Opcode::Ret,
+            (0x2, _, _, _) => Opcode::Call(opcode & 0x0FFF),
             (0x8, _, _, 0x4) => Opcode::Add(x, y),
             _ => todo!("opcode {:04x}", opcode),
         };
@@ -43,14 +52,14 @@ impl CPU {
 
     fn run(&mut self) {
         loop {
-            let opcode_b = self.read_opcode();
-            self.pc += 2;
+            let opcode_b = self.fetch();
             // 4bitずつに分割
             let opcode = self.decode(opcode_b);
             match opcode {
                 Opcode::Halt => return,
                 Opcode::Add(x, y) => self.add_xy(x, y),
-                _ => todo!("opcode {:04x}", opcode_b),
+                Opcode::Call(addr) => self.call(addr),
+                Opcode::Ret => self.ret(),
             }
         }
     }
@@ -68,6 +77,25 @@ impl CPU {
             self.registers[0xF] = 0;
         }
     }
+
+    fn call(&mut self, addr: u16) {
+        if self.sp >= self.stack.len() {
+            panic!("stack overflow");
+        }
+
+        self.stack[self.sp] = self.pc as u16;
+        self.sp += 1;
+        self.pc = addr as usize;
+    }
+
+    fn ret(&mut self) {
+        if self.sp == 0 {
+            panic!("stack underflow");
+        }
+
+        self.sp -= 1;
+        self.pc = self.stack[self.sp] as usize;
+    }
 }
 
 fn main() {
@@ -75,16 +103,18 @@ fn main() {
 
     cpu.registers[0] = 5;
     cpu.registers[1] = 10;
-    cpu.registers[2] = 10;
-    cpu.registers[3] = 10;
 
     let mem = &mut cpu.memory;
-    mem[0] = 0x80; mem[1] = 0x14;
-    mem[2] = 0x80; mem[3] = 0x24;
-    mem[4] = 0x80; mem[5] = 0x34;
+    mem[0x000] = 0x21; mem[0x001] = 0x00;
+    mem[0x002] = 0x21; mem[0x003] = 0x00;
+    mem[0x004] = 0x00; mem[0x005] = 0x00;
+
+    mem[0x100] = 0x80; mem[0x101] = 0x14;
+    mem[0x102] = 0x80; mem[0x103] = 0x14;
+    mem[0x104] = 0x00; mem[0x105] = 0xEE;
 
     cpu.run();
 
-    assert_eq!(cpu.registers[0], 35);
-    println!("5 + 10 + 10 + 10 = {}", cpu.registers[0]);
+    assert_eq!(cpu.registers[0], 45);
+    println!("5 + (10 * 2) + 10 + (10 * 2) = {}", cpu.registers[0]);
 }
