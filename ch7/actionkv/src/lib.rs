@@ -6,10 +6,9 @@ use std::{
 };
 
 use byteorder::{ReadBytesExt, WriteBytesExt};
-use crc;
 
-type ByteString = Vec<u8>;
-type ByteStr = [u8];
+pub type ByteString = Vec<u8>;
+pub type ByteStr = [u8];
 
 #[derive(Debug)]
 pub struct KeyValuePair {

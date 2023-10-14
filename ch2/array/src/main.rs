@@ -12,7 +12,7 @@ fn main() {
         for n in a.iter() {
             print!("{} ", n);
         }
-        println!("");
+        println!();
     }
 
     println!("one: {:?}", one);
