@@ -12,6 +12,7 @@ fn decode(sign: u32, exponent: u32, fraction: u32) -> (f32, f32, f32) {
     let sign_ = (-1.0_f32).powf(sign as f32);
     let exponent_ = RADIX.powf((exponent as i32 - BIAS) as f32);
     let mut mantissa_ = 1.0_f32;
+
     for i in 0..23 {
         let b = fraction & (1 << i);
         if b != 0 {
