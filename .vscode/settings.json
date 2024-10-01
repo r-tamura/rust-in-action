@@ -1,0 +1,14 @@
+{
+  "rust-analyzer.linkedProjects": [
+    "ch2/grep-lite/Cargo.toml",
+    "ch2/array/Cargo.toml",
+    "ch6/memoryscan/Cargo.toml",
+    "ch7/serde-eg/Cargo.toml",
+    "ch7/hexdump/Cargo.toml",
+    "ch7/actionkv/Cargo.toml",
+    "ch8/tcp/Cargo.toml",
+    "ch8/dns/Cargo.toml",
+    "ch8/mget/Cargo.toml",
+    "ch5/floating-point-number/Cargo.toml"
+  ]
+}
